@@ -41,6 +41,7 @@ public:
     /** Smooths the value and handles the minimum marker. Call once per UI frame. */
     void update (double secondsSinceLastFrame, double holdSeconds);
     float getDisplayedValue() const             { return displayed; }
+    float getLowestValue() const                { return lowest; }
 
     void paint (juce::Graphics&) override;
 

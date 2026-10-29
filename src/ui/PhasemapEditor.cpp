@@ -88,6 +88,7 @@ PhasemapEditor::PhasemapEditor (PhasemapProcessor& p)
     setWindowScale (scale);
     windowReady = true;   // from now on, remember size changes
 
+    setWantsKeyboardFocus (true);
     lastFrameMs = juce::Time::getMillisecondCounterHiRes();
     startTimerHz (60);
 }
@@ -228,6 +229,26 @@ void PhasemapEditor::fitToScreen()
         if (auto* window = getTopLevelComponent(); window != nullptr && window != this)
             window->setTopLeftPosition (area.getX() + (area.getWidth() - window->getWidth()) / 2, area.getY());
     }
+}
+
+bool PhasemapEditor::keyPressed (const juce::KeyPress& key)
+{
+   #if PHASEMAP_WITH_INSPECTOR
+    // Cmd+Shift+I (macOS) / Ctrl+Shift+I: open the live UI inspector
+    if (key.getModifiers().isCommandDown() && key.getModifiers().isShiftDown() && key.getKeyCode() == 'I')
+    {
+        if (inspector == nullptr)
+        {
+            inspector = std::make_unique<melatonin::Inspector> (*this);
+            inspector->onClose = [this] { inspector.reset(); };
+        }
+        inspector->setVisible (true);
+        return true;
+    }
+   #else
+    juce::ignoreUnused (key);
+   #endif
+    return false;
 }
 
 void PhasemapEditor::resized()

@@ -86,6 +86,65 @@ namespace
             processor.parameters.getParameter (id)->setValueNotifyingHost (value);
         }
 
+        /** Writes everything the display shows as numbers, for tools/export_design_svg.py. */
+        void saveState (const juce::File& file)
+        {
+            auto& a = editor->getAnalysis();
+            auto* root = new juce::DynamicObject();
+
+            juce::Array<juce::var> bands;
+            for (auto& b : a.getBands())
+            {
+                auto* o = new juce::DynamicObject();
+                o->setProperty ("lowHz", b.lowHz);
+                o->setProperty ("highHz", b.highHz);
+                o->setProperty ("centreHz", b.centreHz);
+                o->setProperty ("levelLeftDb", b.levelLeftDb);
+                o->setProperty ("levelRightDb", b.levelRightDb);
+                o->setProperty ("correlation", b.correlation);
+                bands.add (juce::var (o));
+            }
+            root->setProperty ("bands", bands);
+
+            juce::Array<juce::var> scopeL, scopeR;
+            const int n = (int) a.getScopeLeft().size(), oldest = a.getScopeWritePosition();
+            for (int k = 0; k < n; ++k)
+            {
+                scopeL.add (a.getScopeLeft()[(size_t) ((oldest + k) % n)]);
+                scopeR.add (a.getScopeRight()[(size_t) ((oldest + k) % n)]);
+            }
+            root->setProperty ("scopeLeft", scopeL);
+            root->setProperty ("scopeRight", scopeR);
+
+            root->setProperty ("hasSignal", a.hasSignal());
+            root->setProperty ("balanceDb", a.getBalanceDb());
+            root->setProperty ("correlationShown", editor->getCorrelationBar().getDisplayedValue());
+            root->setProperty ("correlationLowest", editor->getCorrelationBar().getLowestValue());
+
+            auto param = [&] (const char* id) { return processor.parameters.getRawParameterValue (id)->load(); };
+            root->setProperty ("phaseMode", param (ParamID::mode) > 0.5f);
+            root->setProperty ("slow", param (ParamID::slow) > 0.5f);
+            root->setProperty ("mono", param (ParamID::monoCheck) > 0.5f);
+            root->setProperty ("holdMs", param (ParamID::holdMs));
+            root->setProperty ("frozen", editor->isFrozen());
+
+            auto& m = processor.loudness;
+            root->setProperty ("momentary", m.momentary.load());
+            root->setProperty ("shortTerm", m.shortTerm.load());
+            root->setProperty ("integrated", m.integrated.load());
+            root->setProperty ("loudnessRange", m.loudnessRange.load());
+            root->setProperty ("truePeak", m.truePeak.load());
+
+            const auto t = processor.getTarget();
+            root->setProperty ("targetName", t.name);
+            root->setProperty ("targetLufs", t.integratedLufs);
+            root->setProperty ("targetTruePeak", t.truePeakLimitDb);
+            root->setProperty ("targetTolerance", t.toleranceLu);
+
+            file.replaceWithText (juce::JSON::toString (juce::var (root)));
+            std::printf ("%s\n", file.getFullPathName().toRawUTF8());
+        }
+
         void save (const juce::File& file, float scale)
         {
             auto& canvas = editor->getCanvas();
@@ -109,6 +168,7 @@ int main (int argc, char* argv[])
     Session s;
     s.play (12, false);
     s.save (folder.getChildFile ("energy.png"), scale);
+    s.saveState (folder.getChildFile ("energy.json"));
 
     s.setParameter (ParamID::mode, 1.0f);
     s.play (3, false);
@@ -119,6 +179,7 @@ int main (int argc, char* argv[])
         juce::Thread::sleep (5);
     s.editor->advanceOneFrame();
     s.save (folder.getChildFile ("phase-problem.png"), scale);
+    s.saveState (folder.getChildFile ("phase-problem.json"));
 
     s.setParameter (ParamID::mode, 0.0f);
     s.play (3, false);

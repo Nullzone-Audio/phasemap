@@ -7,6 +7,10 @@
 #include "SettingsMenu.h"
 #include "../plugin/PhasemapProcessor.h"
 
+#if PHASEMAP_WITH_INSPECTOR
+ #include <melatonin_inspector/melatonin_inspector.h>
+#endif
+
 namespace phasemap
 {
 
@@ -25,6 +29,7 @@ public:
 
     void paint (juce::Graphics&) override {}
     void resized() override;
+    bool keyPressed (const juce::KeyPress&) override;
 
     void setWindowScale (double scale);
     void fitToScreen();
@@ -36,6 +41,9 @@ public:
     void showHoverTipFor (juce::Component& c)       { hoverTips.showImmediately (c); }
     juce::Component& getPhaseButton()               { return phaseButton; }
     juce::Component& getHoldBox()                   { return holdBox; }
+    const SpectralCorrelation& getAnalysis() const  { return analysis; }
+    const CorrelationBar& getCorrelationBar() const { return correlationBar; }
+    bool isFrozen() const                           { return freezeButton.getToggleState(); }
 
 private:
     /** The scaled drawing surface. Caches the code-drawn background at the current resolution. */
@@ -83,6 +91,10 @@ private:
     bool settingsOpen = false, windowReady = false;
     double settingsVisibility = 0.0, lastFrameMs = 0.0;
     std::vector<float> pullLeft, pullRight;
+
+   #if PHASEMAP_WITH_INSPECTOR
+    std::unique_ptr<melatonin::Inspector> inspector;   // developer builds only, see docs/DEVELOPING.md
+   #endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PhasemapEditor)
 };

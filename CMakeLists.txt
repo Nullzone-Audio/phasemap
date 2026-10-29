@@ -13,6 +13,7 @@ option(PHASEMAP_BUILD_PLUGIN "Build the plugin" ON)
 option(PHASEMAP_BUILD_CLAP   "Also build a CLAP plugin (downloads clap-juce-extensions)" ON)
 option(PHASEMAP_BUILD_TESTS  "Build the tests (run with ctest)" ON)
 option(PHASEMAP_BUILD_TOOLS  "Build the screenshot tool" OFF)
+option(PHASEMAP_INSPECTOR    "Developer build: Cmd/Ctrl+Shift+I opens a live UI inspector (melatonin_inspector)" OFF)
 option(PHASEMAP_NO_LINUX_AUDIO "Linux without ALSA/JACK headers (CI, headless test machines)" OFF)
 
 #===============================================================================
@@ -26,6 +27,16 @@ else()
         GIT_TAG 8.0.10
         GIT_SHALLOW TRUE)
     FetchContent_MakeAvailable(JUCE)
+endif()
+
+if(PHASEMAP_INSPECTOR)
+    # Like the browser's developer tools for JUCE: click any part of the UI to see its bounds,
+    # properties and paint time. MIT licensed, only for development builds.
+    FetchContent_Declare(melatonin_inspector
+        GIT_REPOSITORY https://github.com/sudara/melatonin_inspector.git
+        GIT_TAG 9c483f865854d83fe9873e1c20e3fd772f695f80
+        SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/melatonin_inspector)
+    FetchContent_MakeAvailable(melatonin_inspector)
 endif()
 
 #===============================================================================
@@ -93,6 +104,11 @@ if(PHASEMAP_BUILD_PLUGIN)
             juce::juce_recommended_config_flags
             juce::juce_recommended_lto_flags
             juce::juce_recommended_warning_flags)
+
+    if(PHASEMAP_INSPECTOR)
+        target_link_libraries(Phasemap PRIVATE melatonin_inspector)
+        target_compile_definitions(Phasemap PRIVATE PHASEMAP_WITH_INSPECTOR=1)
+    endif()
 
     if(PHASEMAP_BUILD_CLAP)
         FetchContent_Declare(clap-juce-extensions
