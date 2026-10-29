@@ -1,0 +1,16 @@
+@font-face { font-family: "Archivo"; src: url("../fonts/archivo-variable.woff") format("woff"); font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
+@font-face { font-family: "IBM Plex Sans"; src: url("../fonts/ibm-plex-sans-variable.woff") format("woff"); font-weight: 100 700; font-display: swap; }
+:root { --desk: #f0eeea; --ink: #1d1c1a; --muted: #5d5850; --line: #cbc6be; --accent: #b9600a; --mark: #fbe3c4; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root { --desk: #232220; --ink: #ece8e2; --muted: #a8a197; --line: #3f3c38; --accent: #f29a2e; --mark: #4a3518; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--desk); color: var(--ink); font: 400 1.0625rem/1.65 "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 48px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px)); }
+a { color: var(--accent); }
+.back { font-size: 0.9rem; text-decoration: none; }
+h1 { font: 800 2.4rem/1.1 "Archivo", "Helvetica Neue", Arial, sans-serif; font-variation-settings: "wdth" 112; margin: 18px 0 8px; }
+h2 { font: 700 1.25rem/1.3 "Archivo", "Helvetica Neue", Arial, sans-serif; margin: 36px 0 8px; }
+p, li { max-width: 65ch; }
+.sub { color: var(--muted); }
+address { font-style: normal; }
+mark { background: var(--mark); color: inherit; padding: 0 3px; border-radius: 3px; }
+footer { border-top: 1px solid var(--line); margin-top: 48px; padding-top: 16px; font-size: 0.9rem; color: var(--muted); }
