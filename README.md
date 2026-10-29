@@ -61,6 +61,14 @@ See [`tests/`](tests) - every check prints what it expects.
 The source of nullzone-audio.org is in [`website/`](website): edit `site.html`, run `python3 website/build_site.py`, upload `index.html` and `images/`.
 Showcase images for social media and press are in [`docs/showcase/`](docs/showcase).
 
+## Made by
+
+**Designed by a human, built with AI.**
+
+- **Design and direction:** Leon Tassoulis ([Nullzone Audio](https://nullzone-audio.org)) designed the interface and the workflow by hand and decides what goes into Phasemap.
+- **Code:** written with Claude, an AI assistant by Anthropic.
+- **Accuracy:** checked against the EBU test signals on every build, see [Accuracy](#accuracy). Every contribution from the community is reviewed before it is merged.
+
 ## How it works / contributing
 
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) explains the code in ten minutes, [docs/DEVELOPING.md](docs/DEVELOPING.md) shows how to open it in Xcode with a live UI inspector. Contributions are very welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -68,7 +76,7 @@ Good first issues: new loudness targets, translations of the hover texts, testin
 
 ## Deutsch
 
-Phasemap zeigt pro Frequenz, wo sich ein Mix in Mono auslöscht, und misst die Lautheit nach EBU R128. Kostenlos und quelloffen (GPLv3).
+Phasemap zeigt pro Frequenz, wo sich ein Mix in Mono auslöscht, und misst die Lautheit nach EBU R128. Kostenlos und quelloffen (GPLv3). Oberfläche und Bedienung hat Leon Tassoulis gestaltet, der Code entstand mit Claude (Anthropic), die Messwerte werden bei jedem Build gegen die EBU-Testsignale geprüft.
 Downloads unter *Releases*; Fragen und Fehlerberichte gern auch auf Deutsch in den *Issues*.
 
 ## License
