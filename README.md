@@ -29,7 +29,7 @@ Mono and stereo tracks, any sample rate, any block size. Audio passes through un
 
 ## Download
 
-Installers for macOS (.pkg), Windows (Setup.exe) and Linux (.tar.gz with `install.sh`) are on the [Releases](https://github.com/Nullzone-Audio/phasemap/releases/latest) page.
+Installers for macOS (.pkg), Windows (Setup.exe) and Linux (.tar.gz with `install.sh`) are on the [Releases](https://github.com/Nullzone-Audio/phasemap/releases) page.
 
 > The installers are not code-signed yet. **macOS:** if the .pkg "cannot be opened", go to *System Settings → Privacy & Security* and click **Open Anyway**. **Windows:** SmartScreen → **More info → Run anyway**.
 
