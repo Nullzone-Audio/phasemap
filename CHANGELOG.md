@@ -10,3 +10,4 @@ First public beta and first open-source release (formerly a private tool called 
 - Correlation meter with adjustable minimum hold, goniometer, balance, Mono Check, Freeze
 - Hover explanations, scalable window up to 4K
 - VST3, AU, CLAP, LV2, Standalone on macOS, Windows, Linux; mono and stereo
+- Installers: .pkg for macOS, Setup.exe for Windows, .tar.gz with install.sh for Linux

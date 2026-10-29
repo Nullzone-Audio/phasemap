@@ -29,17 +29,16 @@ Mono and stereo tracks, any sample rate, any block size. Audio passes through un
 
 ## Download
 
-Ready-made builds are on the [Releases](../../releases) page.
+Installers for macOS (.pkg), Windows (Setup.exe) and Linux (.tar.gz with `install.sh`) are on the [Releases](https://github.com/Nullzone-Audio/phasemap/releases/latest) page.
 
-> **macOS:** builds are not signed with an Apple developer certificate yet. After copying the plugin, run
-> `xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/Components/Phasemap.component` (same for the `.vst3` / `.clap`).
+> The installers are not code-signed yet. **macOS:** if the .pkg "cannot be opened", go to *System Settings → Privacy & Security* and click **Open Anyway**. **Windows:** SmartScreen → **More info → Run anyway**.
 
 ## Build it yourself
 
 You need CMake 3.22+ and a C++17 compiler (Xcode, Visual Studio 2022, GCC or Clang). JUCE and the CLAP extensions are downloaded automatically.
 
 ```bash
-git clone https://github.com/nullzone-audio/phasemap.git
+git clone https://github.com/Nullzone-Audio/phasemap.git
 cd phasemap
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release

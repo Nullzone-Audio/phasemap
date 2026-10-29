@@ -51,23 +51,47 @@ jobs:
           [ "$RUNNER_OS" = "Linux" ] && run="xvfb-run -a $run"
           $run --strictness-level 10 --validate-in-process --skip-gui-tests --validate "build/Phasemap_artefacts/Release/VST3/Phasemap.vst3"
 
-      - name: Package
+      - name: Version
         shell: bash
         run: |
-          mkdir -p dist
+          label=$(sed -n 's/^set(PHASEMAP_VERSION_LABEL "\(.*\)").*/\1/p' CMakeLists.txt)
+          version=$(sed -n 's/^project(Phasemap VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
+          echo "LABEL=$label" >> "$GITHUB_ENV"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "SLUG=Phasemap-${label// /-}" >> "$GITHUB_ENV"
+          mkdir -p out
+
+      - name: Installer (macOS .pkg)
+        if: runner.os == 'macOS'
+        run: packaging/macos/build_pkg.sh build/Phasemap_artefacts/Release "$VERSION" "out/$SLUG-macOS.pkg"
+
+      - name: Installer (Windows Setup.exe)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\iscc.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress }
+          & $iscc "/DAppVersion=$env:VERSION" "/DVersionLabel=$env:LABEL" "/DOutputName=$env:SLUG-Windows-Setup" `
+                  "/DArtefacts=$env:GITHUB_WORKSPACE\build\Phasemap_artefacts\Release" packaging\windows\Phasemap.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Move-Item "$env:SLUG-Windows-Setup.exe" out\
+
+      - name: Archive (Linux .tar.gz)
+        if: runner.os == 'Linux'
+        run: |
+          dir="$SLUG-Linux-x86_64"
+          mkdir -p "$dir"
           cd build/Phasemap_artefacts/Release
-          for f in VST3/Phasemap.vst3 AU/Phasemap.component CLAP/Phasemap.clap LV2/Phasemap.lv2; do
-            [ -e "$f" ] && cp -R "$f" "$GITHUB_WORKSPACE/dist/"
-          done
-          [ -d Standalone ] && cp -R Standalone/* "$GITHUB_WORKSPACE/dist/"
+          cp -R VST3/Phasemap.vst3 LV2/Phasemap.lv2 Standalone/Phasemap "$GITHUB_WORKSPACE/$dir/"
+          [ -e CLAP/Phasemap.clap ] && cp -R CLAP/Phasemap.clap "$GITHUB_WORKSPACE/$dir/"
           cd "$GITHUB_WORKSPACE"
-          cp LICENSE README.md dist/
-          7z a "Phasemap-${{ matrix.name }}.zip" ./dist/* > /dev/null
+          cp packaging/linux/install.sh packaging/linux/uninstall.sh LICENSE README.md "$dir/"
+          tar -czf "out/$dir.tar.gz" "$dir"
 
       - uses: actions/upload-artifact@v4
         with:
           name: Phasemap-${{ matrix.name }}
-          path: Phasemap-${{ matrix.name }}.zip
+          path: out/*
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -76,10 +100,17 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
+          path: out
           merge-multiple: true
+      - name: Release name
+        run: echo "LABEL=$(sed -n 's/^set(PHASEMAP_VERSION_LABEL "\(.*\)").*/\1/p' CMakeLists.txt)" >> "$GITHUB_ENV"
       - uses: softprops/action-gh-release@v2
         with:
-          files: Phasemap-*.zip
+          name: Phasemap ${{ env.LABEL }}
+          body_path: .github/release-notes.md
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: out/*
           generate_release_notes: true

@@ -419,26 +419,26 @@ ctest --test-dir build -C Release
       <div class="section-head">
         <div class="eyebrow">Download</div>
         <h2>Pick your system.</h2>
-        <p class="lede">Phasemap Beta 1.0 is on the GitHub releases page. Copy the plugin into the folder below and rescan in your DAW. It is a beta: if anything looks wrong, please tell us.</p>
+        <p class="lede">Phasemap Beta 1.0 comes with an installer for each system, on the GitHub releases page. Run it, then rescan plugins in your DAW. It is a beta: if anything looks wrong, please tell us.</p>
       </div>
       <div class="downloads">
         <div class="os">
           <h3>macOS</h3>
-          <ul><li>AU: <code>/Library/Audio/Plug-Ins/Components</code></li><li>VST3: <code>/Library/Audio/Plug-Ins/VST3</code></li><li>CLAP: <code>/Library/Audio/Plug-Ins/CLAP</code></li></ul>
+          <ul><li>Installer: <code>.pkg</code></li><li>AU, VST3, CLAP to <code>/Library/Audio/<wbr>Plug-Ins</code></li><li>Standalone app to <code>/Applications</code></li></ul>
           <p class="note">Apple Silicon and Intel, macOS 10.13 or newer.</p>
         </div>
         <div class="os">
           <h3>Windows</h3>
-          <ul><li>VST3: <code>C:\Program Files\Common Files\VST3</code></li><li>CLAP: <code>C:\Program Files\Common Files\CLAP</code></li></ul>
+          <ul><li>Installer: <code>Setup.exe</code></li><li>VST3, CLAP to <code>C:\Program Files\<wbr>Common Files</code></li><li>Standalone app to <code>C:\Program Files</code></li></ul>
           <p class="note">Windows 10 or 11, 64-bit.</p>
         </div>
         <div class="os">
           <h3>Linux</h3>
-          <ul><li>VST3: <code>~/.vst3</code></li><li>CLAP: <code>~/.clap</code></li><li>LV2: <code>~/.lv2</code></li></ul>
+          <ul><li>Archive: <code>.tar.gz</code>, unpack and run <code>./install.sh</code></li><li>VST3, CLAP, LV2 to <code>~/.vst3</code>, <code>~/.clap</code>, <code>~/.lv2</code></li></ul>
           <p class="note">Built on Ubuntu 22.04, x86-64.</p>
         </div>
       </div>
-      <div class="actions"><a class="btn primary" href="https://github.com/nullzone-audio/phasemap/releases" target="_blank" rel="noopener">Go to the releases</a></div>
+      <div class="actions"><a class="btn primary" href="https://github.com/Nullzone-Audio/phasemap/releases/latest" target="_blank" rel="noopener">Go to the releases</a></div>
     </div>
   </section>
 
@@ -472,12 +472,13 @@ ctest --test-dir build -C Release
         <h2>Good to know.</h2>
       </div>
       <details>
-        <summary>macOS says the plugin is damaged or from an unidentified developer.</summary>
-        <p>The builds are not yet signed with an Apple developer certificate. After copying, run this once in Terminal (adjust the path for VST3 or CLAP):</p>
-        <div class="codeblock">
-<pre class="code" id="xattr-cmd">sudo xattr -dr com.apple.quarantine /Library/Audio/Plug-Ins/Components/Phasemap.component</pre>
-          <button class="copy" type="button" data-copy="xattr-cmd">Copy</button>
-        </div>
+        <summary>My system warns me about the installer.</summary>
+        <p>The installers are not yet signed with a paid developer certificate, so your system asks once whether you trust them. The code is open, and every installer is built automatically on GitHub from that code.</p>
+        <p><b>macOS:</b> if the .pkg "cannot be opened", go to System Settings &rarr; Privacy &amp; Security, scroll down and click <b>Open Anyway</b>. <b>Windows:</b> if SmartScreen says "Windows protected your PC", click <b>More info</b> &rarr; <b>Run anyway</b>.</p>
+      </details>
+      <details>
+        <summary>How do I remove Phasemap?</summary>
+        <p><b>macOS:</b> delete <code>Phasemap.component</code>, <code>Phasemap.vst3</code> and <code>Phasemap.clap</code> from the folders under /Library/Audio/Plug-Ins, and the app. <b>Windows:</b> Settings &rarr; Apps &rarr; Phasemap &rarr; Uninstall. <b>Linux:</b> run <code>./uninstall.sh</code> from the unpacked folder.</p>
       </details>
       <details>
         <summary>Does Phasemap change my audio?</summary>
