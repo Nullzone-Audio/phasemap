@@ -9,9 +9,9 @@ namespace phasemap
 /** Settings shared by all Phasemap instances on this computer (not stored in projects):
     window size, band resolution and the user's saved loudness targets.
 
-    macOS:   ~/Library/Application Support/Nullzone/Phasemap.settings
-    Windows: %APPDATA%\Nullzone\Phasemap.settings
-    Linux:   ~/.config/Nullzone/Phasemap.settings
+    macOS:   ~/Library/Application Support/Nullzone Audio/Phasemap.settings
+    Windows: %APPDATA%\Nullzone Audio\Phasemap.settings
+    Linux:   ~/.config/Nullzone Audio/Phasemap.settings
 */
 namespace UserSettings
 {

@@ -12,7 +12,7 @@ namespace
         {
             juce::PropertiesFile::Options options;
             options.applicationName = "Phasemap";
-            options.folderName = "Nullzone";
+            options.folderName = "Nullzone Audio";
             options.filenameSuffix = ".settings";
             options.osxLibrarySubFolder = "Application Support";
             file = std::make_unique<juce::PropertiesFile> (options);

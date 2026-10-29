@@ -1,7 +1,7 @@
 # Phasemap
 
 **See where your mix cancels in mono, and how loud it really is.**
-A free, open-source stereo phase and loudness meter by [Nullzone](https://nullzone.org).
+A free, open-source stereo phase and loudness meter by [Nullzone Audio](https://nullzone-audio.org).
 
 ![Phasemap](docs/images/energy.png)
 
@@ -58,7 +58,7 @@ See [`tests/`](tests) - every check prints what it expects.
 
 ## Website
 
-The source of nullzone.org is in [`website/`](website): edit `site.html`, run `python3 website/build_site.py`, upload `index.html` and `images/`.
+The source of nullzone-audio.org is in [`website/`](website): edit `site.html`, run `python3 website/build_site.py`, upload `index.html` and `images/`.
 Showcase images for social media and press are in [`docs/showcase/`](docs/showcase).
 
 ## How it works / contributing

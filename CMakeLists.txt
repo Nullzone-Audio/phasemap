@@ -78,9 +78,9 @@ if(PHASEMAP_BUILD_PLUGIN)
     endif()
 
     juce_add_plugin(Phasemap
-        COMPANY_NAME "Nullzone"
-        COMPANY_WEBSITE "https://nullzone.org"
-        BUNDLE_ID "org.nullzone.phasemap"
+        COMPANY_NAME "Nullzone Audio"
+        COMPANY_WEBSITE "https://nullzone-audio.org"
+        BUNDLE_ID "org.nullzone-audio.phasemap"
         PLUGIN_MANUFACTURER_CODE Nlzn
         PLUGIN_CODE Phmp
         PRODUCT_NAME "Phasemap"
@@ -90,7 +90,7 @@ if(PHASEMAP_BUILD_PLUGIN)
         NEEDS_MIDI_OUTPUT FALSE
         AU_MAIN_TYPE kAudioUnitType_Effect
         VST3_CATEGORIES Fx Analyzer
-        LV2URI "https://nullzone.org/plugins/phasemap"
+        LV2URI "https://nullzone-audio.org/plugins/phasemap"
         FORMATS ${PHASEMAP_FORMATS}
         COPY_PLUGIN_AFTER_BUILD FALSE)
 
@@ -116,7 +116,7 @@ if(PHASEMAP_BUILD_PLUGIN)
             GIT_TAG 7adee3a1bd4684d4caa5601100e364abccff4b4d)   # main, needed for JUCE 8.0.10
         FetchContent_MakeAvailable(clap-juce-extensions)
         clap_juce_extensions_plugin(TARGET Phasemap
-            CLAP_ID "org.nullzone.phasemap"
+            CLAP_ID "org.nullzone-audio.phasemap"
             CLAP_FEATURES audio-effect analyzer stereo mono)
     endif()
 endif()

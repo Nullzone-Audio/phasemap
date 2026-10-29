@@ -234,7 +234,7 @@ void SettingsMenu::paint (juce::Graphics& g)
     text ("Integrated", 36, 350, theme::accent, 14, true);
     text ("Type a name and values, then Save. Saved targets appear under My Targets in every project.", 36, 405, theme::textDim, 13);
     text ("Loudness after ITU-R BS.1770-4 / EBU R128, measured after Mono Check.", 36, 430, theme::textDim, 13);
-    text ("Phasemap by Nullzone - free and open source - nullzone.org", 36, 455, theme::textDim, 13);
+    text ("Phasemap by Nullzone Audio - free and open source - nullzone-audio.org", 36, 455, theme::textDim, 13);
 }
 
 void SettingsMenu::mouseDown (const juce::MouseEvent& e)
