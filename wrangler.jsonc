@@ -1,0 +1,12 @@
+// Cloudflare deployment of nullzone-audio.org: a static site, no server code.
+// Cloudflare rebuilds it on every push to main (Workers Builds, deploy command: npx wrangler deploy).
+// Edit website/site.html, run python3 website/build_site.py, commit index.html.
+{
+  "name": "phasemap",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./website",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}
