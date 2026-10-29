@@ -2,6 +2,7 @@
 
 **See where your mix cancels in mono, and how loud it really is.**
 A free, open-source stereo phase and loudness meter by [Nullzone Audio](https://nullzone-audio.org).
+**Status: Beta 1.0** - versions are named Beta 1.0, 1.1, ... until the first stable release.
 
 ![Phasemap](docs/images/energy.png)
 

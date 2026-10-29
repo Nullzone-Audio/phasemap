@@ -219,6 +219,9 @@ void SettingsMenu::paint (juce::Graphics& g)
     };
 
     text ("PHASEMAP", 36, 24, theme::accent, 20, true);
+   #ifdef PHASEMAP_VERSION_LABEL
+    text (PHASEMAP_VERSION_LABEL, 160, 24, theme::textDim, 14);
+   #endif
     text ("Resolution", 36, 90, theme::accent, 14, true);
     text ("bands in the spectrum", 402, 90, theme::textDim, 14);
     text ("Window Size", 36, 145, theme::accent, 14, true);

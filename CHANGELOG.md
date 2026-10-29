@@ -1,8 +1,8 @@
 # Changelog
 
-## 1.0.0 - unreleased
+## Beta 1.0 - 2026-10-29
 
-First open-source release (formerly a private tool called "Correlation Meter").
+First public beta and first open-source release (formerly a private tool called "Correlation Meter").
 
 - Phase correlation and energy per frequency band (1/3, 1/6, 1/12 octave), Low End alarm
 - Loudness after ITU-R BS.1770-4 / EBU R128: Momentary, Short-term, Integrated, LRA, True Peak

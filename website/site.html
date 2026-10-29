@@ -147,6 +147,18 @@ details p, details .codeblock { margin-top: 12px; color: var(--muted); }
 footer { border-top: 1px solid var(--line); padding-block: 36px; font-size: var(--step--1); color: var(--muted); }
 footer .wrap { display: flex; gap: 24px; flex-wrap: wrap; justify-content: space-between; }
 
+.story { display: grid; gap: 16px; }
+.story p { color: var(--muted); }
+.story .thanks { color: var(--ink); border-left: 3px solid var(--accent-soft); padding-left: 16px; }
+.versions { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.versions > li { border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; display: grid; gap: 8px; }
+.version-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.version-head b { font: 700 1.2rem/1.2 var(--display); font-variation-settings: "wdth" 112; }
+.version-head span { font: 500 var(--step--1)/1 var(--mono); color: var(--muted); }
+.versions p { color: var(--muted); }
+.versions ul { margin: 0; padding-left: 1.1rem; color: var(--muted); font-size: 0.97rem; }
+.beta { display: inline-block; font: 600 0.72rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: #1b1a18; background: var(--accent-soft); border-radius: 4px; padding: 4px 6px; vertical-align: 2px; }
+
 @media (max-width: 900px) {
   .hero .intro, .split { grid-template-columns: minmax(0, 1fr); }
   .features, .downloads { grid-template-columns: minmax(0, 1fr); }
@@ -166,6 +178,7 @@ footer .wrap { display: flex; gap: 24px; flex-wrap: wrap; justify-content: space
       <a href="#features">Features</a>
       <a href="#loudness">Loudness</a>
       <a href="#open-source">Open source</a>
+      <a href="#story">Story</a>
       <a href="#support">Support</a>
       <a href="#download">Download</a>
     </nav>
@@ -176,7 +189,7 @@ footer .wrap { display: flex; gap: 24px; flex-wrap: wrap; justify-content: space
   <div class="hero">
     <div class="wrap intro">
       <div>
-        <div class="eyebrow">Phasemap 1.0 &nbsp;·&nbsp; free and open source</div>
+        <div class="eyebrow"><span class="beta">Beta 1.0</span> &nbsp;Phasemap &nbsp;·&nbsp; free and open source</div>
         <h1>See where your mix <em>cancels.</em></h1>
         <p class="lede">Phasemap shows the phase of every frequency band, so you see exactly what disappears when your mix is played in mono. It measures loudness after EBU R128 while you work.</p>
         <div class="actions">
@@ -351,6 +364,20 @@ ctest --test-dir build -C Release
     </div>
   </section>
 
+  <section id="story">
+    <div class="wrap split">
+      <div class="section-head">
+        <div class="eyebrow">How it started</div>
+        <h2>Made for one studio. Open for everyone.</h2>
+      </div>
+      <div class="story">
+        <p>Phasemap began in October 2026 in a small studio in northern Germany. Leon Tassoulis wanted a meter for his own mixes that shows more than one correlation number: where in the spectrum a mix cancels in mono, and how loud it really is.</p>
+        <p>The first version was a private plugin for his own sessions in Logic. It worked well enough that it deserved more people, so it became Phasemap: free, open source and built to be improved together. Leon had never written a plugin before. Phasemap was developed with Claude, an AI assistant by Anthropic, and every measurement is checked against the published test signals.</p>
+        <p class="thanks">Thank you to everyone who tests it, reports a bug, writes code, translates a help text or simply tells a friend. Every improvement goes into the next version and is credited in the release notes.</p>
+      </div>
+    </div>
+  </section>
+
   <section id="support">
     <div class="wrap">
       <div class="section-head">
@@ -392,7 +419,7 @@ ctest --test-dir build -C Release
       <div class="section-head">
         <div class="eyebrow">Download</div>
         <h2>Pick your system.</h2>
-        <p class="lede">All builds are on the GitHub releases page. Copy the plugin into the folder below and rescan in your DAW.</p>
+        <p class="lede">Phasemap Beta 1.0 is on the GitHub releases page. Copy the plugin into the folder below and rescan in your DAW. It is a beta: if anything looks wrong, please tell us.</p>
       </div>
       <div class="downloads">
         <div class="os">
@@ -412,6 +439,29 @@ ctest --test-dir build -C Release
         </div>
       </div>
       <div class="actions"><a class="btn primary" href="https://github.com/nullzone-audio/phasemap/releases" target="_blank" rel="noopener">Go to the releases</a></div>
+    </div>
+  </section>
+
+  <section id="versions">
+    <div class="wrap split">
+      <div class="section-head">
+        <div class="eyebrow">Versions</div>
+        <h2>Beta 1.0 is out.</h2>
+        <p>Phasemap is in public beta. Versions are named Beta 1.0, Beta 1.1 and so on, until the first stable release, Phasemap 1.0. Everything that changes is listed here and in the changelog on GitHub.</p>
+      </div>
+      <ol class="versions">
+        <li>
+          <div class="version-head"><b>Beta 1.0</b><span>October 2026</span></div>
+          <p>First public version.</p>
+          <ul>
+            <li>Phase and energy per frequency band, Low End lamp</li>
+            <li>Loudness after EBU R128 with built-in and own targets</li>
+            <li>Correlation meter with hold, goniometer, balance, Mono, Freeze</li>
+            <li>Hover help, scalable window up to 4K</li>
+            <li>VST3, AU, CLAP, LV2 and standalone for macOS, Windows and Linux</li>
+          </ul>
+        </li>
+      </ol>
     </div>
   </section>
 
