@@ -56,9 +56,14 @@ The loudness meter is tested against the EBU test signals (Tech 3341 and 3342) a
 The phase analysis is tested with signals whose answer is known (mono, inverted polarity, unrelated noise, a delay that cancels exactly at 1 kHz).
 See [`tests/`](tests) - every check prints what it expects.
 
+## Website
+
+The source of nullzone.org is in [`website/`](website): edit `site.html`, run `python3 website/build_site.py`, upload `index.html` and `images/`.
+Showcase images for social media and press are in [`docs/showcase/`](docs/showcase).
+
 ## How it works / contributing
 
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) explains the code in ten minutes. Contributions are very welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) explains the code in ten minutes, [docs/DEVELOPING.md](docs/DEVELOPING.md) shows how to open it in Xcode with a live UI inspector. Contributions are very welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
 Good first issues: new loudness targets, translations of the hover texts, testing in your DAW.
 
 ## Deutsch

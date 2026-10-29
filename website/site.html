@@ -1,0 +1,526 @@
+<title>Nullzone Phasemap</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Phasemap is a free, open-source stereo phase and loudness meter. See where your mix cancels in mono, frequency by frequency, and measure loudness after EBU R128.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,500;112,700;125,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout concept: a mixing-console strip. Grey hardware panels lit from the top right sit on a graphite
+   desk; the orange of the meter is the only accent. Sections read like labelled console sections. */
+:root {
+  --desk: #f0eeea;          /* page */
+  --panel: #dedad4;         /* raised surfaces */
+  --panel-hi: #f7f5f2;
+  --panel-lo: #b8b2a9;
+  --inset: #4c4a47;         /* display glass */
+  --ink: #1d1c1a;
+  --muted: #5d5850;
+  --line: #cbc6be;
+  --accent: #b9600a;        /* meter orange, darkened for light backgrounds */
+  --accent-soft: #f29a2e;
+  --green: #2f9d39; --yellow: #c99a10; --red: #c8352b;
+  --code-bg: #262523; --code-ink: #e7e2da;
+
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", Menlo, Consolas, monospace;
+
+  --step--1: 0.875rem; --step-0: 1.0625rem; --step-1: 1.3rem; --step-2: 1.75rem; --step-3: 2.6rem; --step-4: clamp(2.6rem, 6vw, 4.6rem);
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --desk: #232220; --panel: #34322f; --panel-hi: #4a4743; --panel-lo: #1b1a18; --inset: #4f4d4a;
+  --ink: #ece8e2; --muted: #a8a197; --line: #3f3c38; --accent: #f29a2e; --accent-soft: #f29a2e;
+  --green: #3fc24a; --yellow: #f2c230; --red: #e0362c; --code-bg: #171615; --code-ink: #e7e2da;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --desk: #232220; --panel: #34322f; --panel-hi: #4a4743; --panel-lo: #1b1a18; --inset: #4f4d4a;
+  --ink: #ece8e2; --muted: #a8a197; --line: #3f3c38; --accent: #f29a2e; --accent-soft: #f29a2e;
+  --green: #3fc24a; --yellow: #f2c230; --red: #e0362c; --code-bg: #171615; --code-ink: #e7e2da;
+  color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--desk); color: var(--ink); font: 400 var(--step-0)/1.6 var(--body); }
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.05; }
+h2 { font-size: var(--step-3); font-variation-settings: "wdth" 112; font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: var(--step-1); font-weight: 700; font-variation-settings: "wdth" 112; }
+p { margin: 0; max-width: 65ch; }
+code, pre, .mono { font-family: var(--mono); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: var(--gutter-l); padding-right: var(--gutter-r); }
+.eyebrow { font: 600 var(--step--1)/1.2 var(--body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+.lede { font-size: var(--step-1); line-height: 1.5; color: var(--muted); }
+
+/* header */
+.top { border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: 24px; padding-block: 18px; flex-wrap: wrap; }
+.logo { font: 800 1.05rem/1 var(--display); font-variation-settings: "wdth" 125; letter-spacing: 0.22em; color: var(--ink); text-decoration: none; }
+.logo b { color: var(--accent); font-weight: 800; }
+.nav { display: flex; gap: 20px; flex-wrap: wrap; margin-left: auto; font-size: var(--step--1); }
+.nav a { color: var(--muted); text-decoration: none; }
+.nav a:hover { color: var(--ink); }
+
+/* hero */
+.hero .intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 48px; align-items: center; padding-block: 64px 40px; }
+.hero h1 { font-size: var(--step-4); font-weight: 800; font-variation-settings: "wdth" 125; letter-spacing: -0.02em; margin: 14px 0 20px; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 22px; border-radius: 10px; font: 600 1rem/1 var(--body); text-decoration: none; border: 1.5px solid var(--ink); color: var(--ink); background: transparent; cursor: pointer; }
+.btn.primary { background: var(--accent-soft); border-color: #2a2a2a; color: #1b1a18;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 2px 0 #2a2a2a; }
+.btn:hover { transform: translateY(-1px); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; padding: 0; list-style: none; }
+.chips li { font: 500 var(--step--1)/1 var(--mono); border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; color: var(--muted); }
+
+/* the instrument: hardware panel with an inset display (same look as the plugin) */
+.panel { background: linear-gradient(180deg, var(--panel-hi), var(--panel) 18%); border: 1px solid var(--panel-lo); border-radius: 6px; padding: 14px;
+  box-shadow: inset -3px 0 0 rgba(255,255,255,.12), inset 3px 0 0 rgba(0,0,0,.18), 0 18px 40px rgba(0,0,0,.18); }
+.display { background: var(--inset); border-radius: 2px; box-shadow: inset 4px 4px 0 rgba(0,0,0,.35), inset -1px -1px 0 rgba(255,255,255,.15); position: relative; }
+#phasefield { width: 100%; aspect-ratio: 4 / 3; display: block; }
+.display .legend { position: absolute; left: 12px; right: 12px; bottom: 8px; display: flex; justify-content: space-between; font: 500 0.72rem/1 var(--mono); color: #a7a29b; }
+.panel-caption { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; font: 500 0.78rem/1.3 var(--mono); color: var(--muted); flex-wrap: wrap; }
+.lamp { display: inline-flex; align-items: center; gap: 6px; }
+.lamp i { width: 9px; height: 9px; border-radius: 50%; background: #5a2622; display: inline-block; }
+.lamp.on i { background: var(--red); box-shadow: 0 0 0 4px color-mix(in srgb, var(--red) 30%, transparent); }
+
+/* sections */
+section { padding-block: 72px; border-top: 1px solid var(--line); }
+.section-head { display: grid; gap: 14px; margin-bottom: 36px; }
+.shot { border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+.fullshot { padding-bottom: 72px; }
+
+.compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.compare figure { margin: 0; display: grid; gap: 10px; }
+figcaption { font-size: var(--step--1); color: var(--muted); }
+figcaption b { color: var(--ink); font-weight: 600; }
+.scale { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 28px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.scale div { padding: 14px; font-size: var(--step--1); color: var(--muted); border-left: 1px solid var(--line); min-width: 0; }
+.scale div:first-child { border-left: none; }
+.scale b { display: block; font: 600 1.15rem/1.2 var(--mono); color: var(--ink); margin-bottom: 4px; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
+
+.features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 32px; }
+.feature { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.feature .media { background: var(--inset); border-radius: 6px; display: grid; place-items: center; padding: 14px; aspect-ratio: 4 / 3; overflow: hidden; }
+.feature .media img { max-height: 100%; width: auto; border-radius: 3px; }
+.feature p { color: var(--muted); font-size: 0.98rem; }
+
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th, td { text-align: left; padding: 11px 14px; border-top: 1px solid var(--line); }
+td.num, th.num { white-space: nowrap; }
+thead th { border-top: none; font: 600 0.75rem/1.2 var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); background: color-mix(in srgb, var(--panel) 60%, transparent); }
+td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.pass { color: var(--green); font-family: var(--mono); font-weight: 500; }
+.note { font-size: var(--step--1); color: var(--muted); margin-top: 12px; }
+
+pre.code { background: var(--code-bg); color: var(--code-ink); border-radius: 10px; padding: 18px 20px; overflow-x: auto; font-size: 0.88rem; line-height: 1.7; margin: 0; }
+pre.code .c { color: #8d877e; }
+.codeblock { position: relative; }
+.copy { position: absolute; top: 10px; right: 10px; font: 500 0.75rem/1 var(--body); padding: 7px 10px; border-radius: 6px; border: 1px solid #55514b; background: #2f2d2a; color: #e7e2da; cursor: pointer; }
+.tree { display: grid; gap: 10px; margin-top: 20px; }
+.tree div { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 12px; font-size: 0.95rem; }
+.tree code { color: var(--accent); }
+
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.card { border: 1px solid var(--line); border-radius: 12px; padding: 22px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card p { color: var(--muted); font-size: 0.98rem; }
+.card svg { width: 26px; height: 26px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.downloads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.os { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.os ul { margin: 0; padding-left: 1.1rem; color: var(--muted); font-size: 0.95rem; }
+.os code { font-size: 0.82rem; overflow-wrap: anywhere; }
+
+details { border-top: 1px solid var(--line); padding-block: 16px; }
+details:last-of-type { border-bottom: 1px solid var(--line); }
+summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+summary::after { content: "+"; font-family: var(--mono); color: var(--accent); }
+details[open] summary::after { content: "–"; }
+details p, details .codeblock { margin-top: 12px; color: var(--muted); }
+
+footer { border-top: 1px solid var(--line); padding-block: 36px; font-size: var(--step--1); color: var(--muted); }
+footer .wrap { display: flex; gap: 24px; flex-wrap: wrap; justify-content: space-between; }
+
+@media (max-width: 900px) {
+  .hero .intro, .split { grid-template-columns: minmax(0, 1fr); }
+  .features, .downloads { grid-template-columns: minmax(0, 1fr); }
+  .compare, .cards { grid-template-columns: minmax(0, 1fr); }
+  .scale { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .scale div { border-left: none; border-top: 1px solid var(--line); }
+  .nav { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .btn:hover { transform: none; } }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#top">NULL<b>ZONE</b></a>
+    <nav class="nav" aria-label="Main">
+      <a href="#read">How to read it</a>
+      <a href="#features">Features</a>
+      <a href="#loudness">Loudness</a>
+      <a href="#open-source">Open source</a>
+      <a href="#support">Support</a>
+      <a href="#download">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap intro">
+      <div>
+        <div class="eyebrow">Phasemap 1.0 &nbsp;·&nbsp; free and open source</div>
+        <h1>See where your mix <em>cancels.</em></h1>
+        <p class="lede">Phasemap shows the phase of every frequency band, so you see exactly what disappears when your mix is played in mono. It measures loudness after EBU R128 while you work.</p>
+        <div class="actions">
+          <a class="btn primary" href="#download">Download Phasemap</a>
+          <a class="btn" href="https://github.com/nullzone-audio/phasemap" target="_blank" rel="noopener">Source code</a>
+        </div>
+        <ul class="chips" aria-label="Formats and systems">
+          <li>VST3</li><li>AU</li><li>CLAP</li><li>LV2</li><li>Standalone</li><li>macOS</li><li>Windows</li><li>Linux</li>
+        </ul>
+      </div>
+
+      <div class="panel" aria-label="Animated example of the phase display">
+        <div class="display">
+          <canvas id="phasefield" width="800" height="600" role="img" aria-label="Frequency bands from 20 Hz to 20 kHz. Most are green and in phase; the low end now and then turns red when it cancels."></canvas>
+          <div class="legend" aria-hidden="true"><span>−1</span><span>0</span><span>+1</span><span>0</span><span>−1</span></div>
+        </div>
+        <div class="panel-caption">
+          <span>Phase per band · 20 Hz – 20 kHz · 1/6 octave</span>
+          <span class="lamp" id="lamp"><i></i>Low End</span>
+        </div>
+      </div>
+    </div>
+    <div class="wrap fullshot">
+      <img class="shot" src="images/phasemap-energy.webp" width="1600" height="900" alt="The Phasemap window: spectrum display, loudness column, correlation meter, goniometer and switches.">
+    </div>
+  </div>
+
+  <section id="read">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">How to read it</div>
+        <h2>Centre is safe. The edge is gone in mono.</h2>
+        <p class="lede">In Phase mode every horizontal bar is one frequency band, 20 Hz at the bottom and 20 kHz at the top. A bar's width tells you how far that band is from perfect phase, no matter how loud it is.</p>
+      </div>
+      <div class="compare">
+        <figure>
+          <img class="shot" src="images/phase-clean.webp" width="900" height="658" alt="Phase display of a clean mix: thin green bars along the centre line.">
+          <figcaption><b>A healthy mix.</b> Thin green bars on the centre line: everything survives the mono sum.</figcaption>
+        </figure>
+        <figure>
+          <img class="shot" src="images/phase-problem.webp" width="900" height="658" alt="Phase display with wide red bars below 200 Hz and the Low End lamp lit.">
+          <figcaption><b>Same song, bass flipped in one channel.</b> Everything below 200 Hz spreads to the edge in red, and the Low End lamp blinks: in mono, the bass is gone.</figcaption>
+        </figure>
+      </div>
+      <div class="scale" role="list" aria-label="What the bar width means">
+        <div role="listitem"><b>+1</b>Centre. Identical in both channels, plays fully in mono.</div>
+        <div role="listitem"><b>+0.3 … +1</b><span class="sw" style="background:var(--green)"></span>Green. Stable stereo.</div>
+        <div role="listitem"><b>0 … +0.3</b><span class="sw" style="background:var(--yellow)"></span>Yellow. Wide; partly lost in mono.</div>
+        <div role="listitem"><b>below 0</b><span class="sw" style="background:var(--red)"></span>Red. Cancels when summed.</div>
+        <div role="listitem"><b>−1</b>Edge. Fully out of phase, silent in mono.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Features</div>
+        <h2>Everything at the end of the channel, in one window.</h2>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <div class="media"><img src="images/energy-spectrum.webp" width="900" height="658" alt="Energy mode: orange bars to the left and right of the centre per band."></div>
+          <h3>Energy per band</h3>
+          <p>The level of L to the left and R to the right, per frequency band. A lopsided shape shows which part of the mix leans to one side.</p>
+        </div>
+        <div class="feature">
+          <div class="media"><img src="images/loudness.webp" width="426" height="957" alt="Loudness column with Momentary and Short-term bars, Integrated, Range and True Peak."></div>
+          <h3>Loudness after EBU R128</h3>
+          <p>Momentary, short-term, integrated, loudness range and true peak, with a target line for the platform you deliver to.</p>
+        </div>
+        <div class="feature">
+          <div class="media"><img src="images/goniometer.webp" width="450" height="439" alt="Goniometer showing a wide horizontal trace when the bass is out of phase."></div>
+          <h3>Goniometer and balance</h3>
+          <p>The classic picture of the stereo field and the overall L/R level difference, next to the band details.</p>
+        </div>
+        <div class="feature">
+          <div class="media"><img src="images/correlation.webp" width="1400" height="182" alt="Correlation meter as a row of LEDs with a white marker at the lowest value."></div>
+          <h3>Correlation with memory</h3>
+          <p>The overall correlation as LEDs. A white marker holds the lowest value for as long as you set, in milliseconds.</p>
+        </div>
+        <div class="feature">
+          <div class="media"><img src="images/hover-tip.webp" width="513" height="412" alt="An explanation box below the Phase button."></div>
+          <h3>Help where you look</h3>
+          <p>Rest the mouse on any control for three seconds and a short explanation fades in. No manual needed.</p>
+        </div>
+        <div class="feature">
+          <div class="media"><img src="images/settings.webp" width="990" height="750" alt="Settings panel with resolution, window size and loudness targets."></div>
+          <h3>Sized for your screen</h3>
+          <p>Drag the window from 50 % to 400 %, or fit it to a second monitor. Mono button to listen to the sum, Freeze to stop the display.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="loudness">
+    <div class="wrap split">
+      <div class="section-head">
+        <div class="eyebrow">Loudness targets</div>
+        <h2>Know when the master is ready.</h2>
+        <p class="lede">Choose where your music is going. Integrated turns green on target, yellow when too quiet and red when too loud. True peak turns red above the limit.</p>
+        <p>Your own targets are saved for every project. The target travels with the session, so a mix opened on another computer still shows the right goal.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Target</th><th class="num">Integrated</th><th class="num">True peak</th></tr></thead>
+          <tbody>
+            <tr><td>EBU R128 (broadcast, Europe)</td><td class="num">−23 LUFS</td><td class="num">−1 dBTP</td></tr>
+            <tr><td>ATSC A/85 (broadcast, US)</td><td class="num">−24 LUFS</td><td class="num">−2 dBTP</td></tr>
+            <tr><td>YouTube, Spotify, TIDAL, Amazon, SoundCloud</td><td class="num">−14 LUFS</td><td class="num">−1 dBTP</td></tr>
+            <tr><td>Spotify Loud</td><td class="num">−11 LUFS</td><td class="num">−1 dBTP</td></tr>
+            <tr><td>Deezer</td><td class="num">−15 LUFS</td><td class="num">−1 dBTP</td></tr>
+            <tr><td>Apple Music, Apple Podcasts</td><td class="num">−16 LUFS</td><td class="num">−1 dBTP</td></tr>
+            <tr><td>AES streaming, speech</td><td class="num">−18 LUFS</td><td class="num">−1 dBTP</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="wrap" style="margin-top:48px">
+      <div class="section-head">
+        <h3>Checked against the EBU test signals</h3>
+        <p>Every build is measured with the reference cases from EBU Tech 3341 and 3342 at 44.1 to 192 kHz. A few of the results at 48 kHz:</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Test signal</th><th class="num">Expected</th><th class="num">Phasemap</th><th>Result</th></tr></thead>
+          <tbody>
+            <tr><td>1 kHz sine, −23 dBFS, stereo</td><td class="num">−23.0 LUFS</td><td class="num">−22.99</td><td class="pass">pass</td></tr>
+            <tr><td>−36 / −23 / −36 dBFS (relative gate)</td><td class="num">−23.0 LUFS</td><td class="num">−23.01</td><td class="pass">pass</td></tr>
+            <tr><td>−72 / −36 / −23 / −36 / −72 dBFS (both gates)</td><td class="num">−23.0 LUFS</td><td class="num">−23.01</td><td class="pass">pass</td></tr>
+            <tr><td>20 s at −20, then −30 dBFS</td><td class="num">10 LU range</td><td class="num">10.0</td><td class="pass">pass</td></tr>
+            <tr><td>Sine at fs/4, samples at −3 dB</td><td class="num">0.0 dBTP</td><td class="num">+0.11</td><td class="pass">pass</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Tolerance ±0.1 LU for loudness, +0.2 / −0.4 dB for true peak, as specified by the EBU.</p>
+    </div>
+  </section>
+
+  <section id="open-source">
+    <div class="wrap split">
+      <div class="section-head">
+        <div class="eyebrow">Open source</div>
+        <h2>Read it. Check it. Make it better.</h2>
+        <p class="lede">Phasemap is free software under the GPLv3. You can read how every number is calculated, build it yourself and send improvements.</p>
+        <div class="tree">
+          <div><code>src/dsp</code><span>The measurements. No user interface, fully tested.</span></div>
+          <div><code>src/plugin</code><span>Parameters, project state, audio routing.</span></div>
+          <div><code>src/ui</code><span>The window, drawn entirely in code.</span></div>
+          <div><code>tests</code><span>EBU cases, phase cases, every sample rate and block size.</span></div>
+        </div>
+        <div class="actions">
+          <a class="btn" href="https://github.com/nullzone-audio/phasemap" target="_blank" rel="noopener">GitHub repository</a>
+          <a class="btn" href="https://github.com/nullzone-audio/phasemap/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">How to contribute</a>
+        </div>
+      </div>
+      <div>
+        <div class="codeblock">
+<pre class="code" id="build-cmds"><span class="c"># build and test it yourself (CMake 3.22+, C++17)</span>
+git clone https://github.com/nullzone-audio/phasemap.git
+cd phasemap
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+ctest --test-dir build -C Release
+
+<span class="c"># 100% tests passed, 0 tests failed out of 3</span></pre>
+          <button class="copy" type="button" data-copy="build-cmds">Copy</button>
+        </div>
+        <p class="note">Good first contributions: a new loudness target, a clearer help text, a translation, or testing Phasemap in your DAW and reporting what you find.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="support">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Support</div>
+        <h2>Free forever. Built together.</h2>
+        <p class="lede">Phasemap costs nothing and has no account, no licence key and no tracking.</p>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8a4 4 0 0 1 8 0v6a4 4 0 0 1-8 0z"/><path d="M12 12v6M4 10h4M16 10h4M4 16h4M16 16h4"/></svg>
+          <h3>Report a problem</h3>
+          <p>Open an issue on GitHub with your DAW, system, plugin format and a screenshot. English or German both work.</p>
+          <a href="https://github.com/nullzone-audio/phasemap/issues" target="_blank" rel="noopener">Open an issue</a>
+        </div>
+        <div class="card">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>
+          <h3>Ask a question</h3>
+          <p>Not sure what a display means, or how to install on your system? Check the answers below, or start a discussion.</p>
+          <a href="https://github.com/nullzone-audio/phasemap/discussions" target="_blank" rel="noopener">Join the discussion</a>
+        </div>
+        <div class="card">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>
+          <h3>Contribute</h3>
+          <p>Fix a bug, add a feature, improve the design. The architecture guide explains the code in ten minutes.</p>
+          <a href="https://github.com/nullzone-audio/phasemap/blob/main/docs/ARCHITECTURE.md" target="_blank" rel="noopener">Read the architecture guide</a>
+        </div>
+        <div class="card">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+          <h3>Support the project</h3>
+          <p>Star the repository, tell other engineers about it, or share a mix where it helped. Donations open soon.</p>
+          <a href="https://github.com/nullzone-audio/phasemap" target="_blank" rel="noopener">Star on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="download">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Download</div>
+        <h2>Pick your system.</h2>
+        <p class="lede">All builds are on the GitHub releases page. Copy the plugin into the folder below and rescan in your DAW.</p>
+      </div>
+      <div class="downloads">
+        <div class="os">
+          <h3>macOS</h3>
+          <ul><li>AU: <code>/Library/Audio/Plug-Ins/Components</code></li><li>VST3: <code>/Library/Audio/Plug-Ins/VST3</code></li><li>CLAP: <code>/Library/Audio/Plug-Ins/CLAP</code></li></ul>
+          <p class="note">Apple Silicon and Intel, macOS 10.13 or newer.</p>
+        </div>
+        <div class="os">
+          <h3>Windows</h3>
+          <ul><li>VST3: <code>C:\Program Files\Common Files\VST3</code></li><li>CLAP: <code>C:\Program Files\Common Files\CLAP</code></li></ul>
+          <p class="note">Windows 10 or 11, 64-bit.</p>
+        </div>
+        <div class="os">
+          <h3>Linux</h3>
+          <ul><li>VST3: <code>~/.vst3</code></li><li>CLAP: <code>~/.clap</code></li><li>LV2: <code>~/.lv2</code></li></ul>
+          <p class="note">Built on Ubuntu 22.04, x86-64.</p>
+        </div>
+      </div>
+      <div class="actions"><a class="btn primary" href="https://github.com/nullzone-audio/phasemap/releases" target="_blank" rel="noopener">Go to the releases</a></div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Questions</div>
+        <h2>Good to know.</h2>
+      </div>
+      <details>
+        <summary>macOS says the plugin is damaged or from an unidentified developer.</summary>
+        <p>The builds are not yet signed with an Apple developer certificate. After copying, run this once in Terminal (adjust the path for VST3 or CLAP):</p>
+        <div class="codeblock">
+<pre class="code" id="xattr-cmd">sudo xattr -dr com.apple.quarantine /Library/Audio/Plug-Ins/Components/Phasemap.component</pre>
+          <button class="copy" type="button" data-copy="xattr-cmd">Copy</button>
+        </div>
+      </details>
+      <details>
+        <summary>Does Phasemap change my audio?</summary>
+        <p>No. Audio passes through bit for bit, with no latency. Only the Mono button changes what you hear, by summing L and R for as long as it is on.</p>
+      </details>
+      <details>
+        <summary>Which DAWs work?</summary>
+        <p>Any host that loads VST3, AU, CLAP or LV2: Logic Pro, Ableton Live, Cubase, Reaper, Bitwig, Studio One, FL Studio, DaVinci Resolve (Fairlight, VST3) and more, on mono and stereo tracks at any sample rate. Pro Tools needs the AAX format, which Phasemap does not offer yet.</p>
+      </details>
+      <details>
+        <summary>Why does Integrated keep running when the window is closed?</summary>
+        <p>Loudness is measured in the audio engine, so a whole song or episode is measured even if you never open the window. Press Reset, or turn on "Reset Integrated when playback starts" in the settings.</p>
+      </details>
+      <details>
+        <summary>Where are the settings?</summary>
+        <p>Click the word PHASEMAP in the top right corner of the plugin: band resolution, window size, loudness targets and your own saved targets.</p>
+      </details>
+      <details>
+        <summary>Is it really free? What is the catch?</summary>
+        <p>There is none. Phasemap is GPLv3 open source and will stay free. Nullzone is a small open project; if it helps you, the best payment is a bug report, a contribution or telling a friend.</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span><b>Nullzone</b> · open tools for engineers · nullzone.org</span>
+    <span>Phasemap is free software under the GPLv3. VST is a trademark of Steinberg Media Technologies GmbH.</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  // Copy buttons: copy the text of the referenced code block
+  document.querySelectorAll(".copy").forEach(button => {
+    button.addEventListener("click", () => {
+      const source = document.getElementById(button.dataset.copy);
+      const text = source.innerText.split("\n").filter(l => !l.trim().startsWith("#")).join("\n").trim();
+      const done = () => { button.textContent = "Copied"; setTimeout(() => (button.textContent = "Copy"), 1600); };
+      const fallback = () => { const r = document.createRange(); r.selectNodeContents(source); const s = getSelection(); s.removeAllRanges(); s.addRange(r); button.textContent = "Selected"; };
+      try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+    });
+  });
+
+  // The phase field: a calm imitation of the plugin's Phase mode.
+  const canvas = document.getElementById("phasefield");
+  const lamp = document.getElementById("lamp");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const bandsPerOctave = 6, low = 20, high = 20000;
+  const bands = [];
+  for (let i = 0; i < Math.ceil(Math.log2(high / low) * bandsPerOctave); i++) {
+    const centre = low * Math.pow(2, (i + 0.5) / bandsPerOctave);
+    bands.push({ centre, seed: Math.sin(i * 12.9898) * 43758.5453 % 1, audible: centre < 400 || centre > 2500 || i % 3 !== 0 });
+  }
+  const colour = c => c < 0 ? getComputedStyle(document.documentElement).getPropertyValue("--red").trim()
+                     : c < 0.3 ? getComputedStyle(document.documentElement).getPropertyValue("--yellow").trim()
+                     : getComputedStyle(document.documentElement).getPropertyValue("--green").trim();
+
+  function correlationAt(band, t) {
+    // most bands sit close to +1; highs breathe a little; the low end drops out of phase every few seconds
+    const wobble = 0.08 * Math.sin(t * 0.9 + band.seed * 20) + 0.05 * Math.sin(t * 2.3 + band.seed * 7);
+    let c = band.centre > 4000 ? 0.62 + wobble : band.centre > 800 ? 0.82 + wobble : 0.95 + wobble * 0.3;
+    const cycle = (t % 9) / 9;                                  // a nine-second story
+    const trouble = Math.max(0, Math.sin(Math.PI * Math.min(1, Math.max(0, (cycle - 0.45) / 0.35))));
+    if (band.centre < 160) c = c - trouble * 1.8;
+    return Math.max(-1, Math.min(1, c));
+  }
+
+  function draw(t) {
+    const w = canvas.width, h = canvas.height, top = 24, bottom = h - 40, cx = w / 2, half = w / 2 - 28;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = "rgba(255,255,255,0.10)"; ctx.lineWidth = 1;
+    [-1, -0.5, 0, 0.5, 1].forEach(p => { ctx.beginPath(); ctx.moveTo(cx + p * half, top); ctx.lineTo(cx + p * half, bottom); ctx.stroke(); });
+    let alarm = false;
+    const yOf = hz => bottom - (Math.log10(hz) - Math.log10(low)) / 3 * (bottom - top);
+    bands.forEach(b => {
+      if (!b.audible) return;
+      const y0 = yOf(b.centre * Math.pow(2, 0.5 / bandsPerOctave)), y1 = yOf(b.centre / Math.pow(2, 0.5 / bandsPerOctave));
+      const c = correlationAt(b, t), width = (1 - c) / 2 * half;
+      ctx.globalAlpha = 0.9; ctx.fillStyle = colour(c);
+      ctx.fillRect(cx - width, y0 + 1, Math.max(2, width * 2), Math.max(2, y1 - y0 - 2));
+      if (b.centre < 160 && c < 0) alarm = true;
+    });
+    ctx.globalAlpha = 1;
+    lamp.classList.toggle("on", alarm && (reduced || Math.floor(t * 2.5) % 2 === 0));
+  }
+
+  if (reduced) { draw(6.1); return; }   // a still frame that shows the Low End warning
+  let start = null;
+  const frame = now => { if (start === null) start = now; draw((now - start) / 1000 + 1); requestAnimationFrame(frame); };
+  draw(1);
+  requestAnimationFrame(frame);
+})();
+</script>
